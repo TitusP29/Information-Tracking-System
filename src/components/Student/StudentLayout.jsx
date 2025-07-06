@@ -1,5 +1,5 @@
 import React from "react";
-import { FaUserCircle, FaGraduationCap, FaFileAlt, FaBell, FaSignOutAlt, FaChartBar } from "react-icons/fa";
+import { FaUserCircle, FaGraduationCap, FaFileAlt, FaBell, FaSignOutAlt, FaChartBar, FaLaptop } from "react-icons/fa";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from '../../../supabaseClient';
 
@@ -28,6 +28,9 @@ const StudentLayout = () => {
         </Link>
         <Link to="/documents" className="flex items-center px-3 py-2 hover:bg-gray-700 rounded mb-2">
           <FaFileAlt className="mr-2" /> Documents
+        </Link>
+        <Link to="/ienabler" className="flex items-center px-3 py-2 hover:bg-gray-700 rounded mb-2">
+          <FaLaptop className="mr-2" /> I-Enabler Dashboard
         </Link>
         <Link to="/aboutus" className="flex items-center px-3 py-2 hover:bg-gray-700 rounded mb-2">
           <FaUserCircle className="mr-2" /> About Us

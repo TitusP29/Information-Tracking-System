@@ -9,6 +9,7 @@ import ApplicationIntake from './components/Student/ApplicationIntake'
 import Register from './components/Student/Register'
 import RegistrationProgress from './components/Student/RegistrationProgress'
 import Documents from './components/Student/Documents'
+import IEnablerStudentDashboard from './components/IEnabler/IEnablerStudentDashboard'
 
 import Login from './components/Auth/login'
 import AboutUs from './components/Student/Aboutus'
@@ -28,6 +29,9 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<Signup />} />
+          
+          {/* I-Enabler Dashboard - Standalone */}
+          <Route path="/ienabler/*" element={<IEnablerStudentDashboard />} />
           
           {/* Student Routes with Layout */}
           <Route element={<StudentLayout />}>
