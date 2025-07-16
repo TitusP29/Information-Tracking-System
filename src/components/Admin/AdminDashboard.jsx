@@ -2,12 +2,41 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Bell, UserCheck, Settings, LogOut, RefreshCw, CalendarCheck2, ClipboardList, Users, UserX, Clock } from 'lucide-react';
+import {
+  Home,
+  CalendarDays,
+  BookOpen,
+  Bell,
+  FileText,
+  GraduationCap,
+  Briefcase,
+  Activity,
+  User,
+  Sun,
+  Moon,
+  LogOut,
+  ClipboardList,
+  Users,
+  Settings,
+  RefreshCw,
+  Mail,
+  Volume2,
+  Monitor,
+  Minimize2,
+  Palette,
+  Globe,
+  RotateCcw,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Award
+} from 'lucide-react';
 import Notifications from './Notifications';
 import RegProgress from './RegProgress';
 import ViewReg from './ViewReg';
 import ManageCourse from './ManageCourse';
 import ManageStudent from './ManageStudent';
+
 import { supabase } from '../../../supabaseClient';
 
 export default function AdminDashboard() {
@@ -108,13 +137,13 @@ export default function AdminDashboard() {
     },
     {
       label: 'View Registration',
-      icon: <CalendarCheck2 size={16} />,
+      icon: <CalendarDays size={16} />,
       activeClass: 'bg-emerald-700 text-white',
       inactiveClass: 'bg-emerald-100 text-emerald-800',
     },
     {
       label: 'Manage Course Applications',
-      icon: <CalendarCheck2 size={16} />,
+      icon: <CalendarDays size={16} />,
       activeClass: 'bg-emerald-700 text-white',
       inactiveClass: 'bg-emerald-100 text-emerald-800',
     },
@@ -163,290 +192,280 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- UI Refactor Start ---
   if (loading) {
     return (
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-4 flex flex-col items-center justify-center">
-                <div className="w-8 h-8 bg-gray-200 rounded-full mb-2" />
-                <div className="w-24 h-4 bg-gray-200 rounded mb-2" />
-                <div className="w-8 h-6 bg-gray-200 rounded" />
-              </CardContent>
-            </Card>
-          ))}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 flex flex-col items-center">
+          <h2 className="text-2xl font-bold mb-4 text-blue-700 dark:text-cyan-400">Admin Dashboard</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 animate-pulse flex flex-col items-center">
+                <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-full mb-3" />
+                <div className="w-24 h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
+                <div className="w-10 h-6 bg-gray-200 dark:bg-gray-600 rounded" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen flex ${settings.darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen flex flex-col md:flex-row ${settings.darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50'}`}>
       {/* Sidebar */}
-      <aside className="w-64 min-h-screen bg-[#1e2a38] text-white flex flex-col py-6 px-4">
-        <div className="text-center text-3xl font-bold text-cyan-400 mb-2">GAS</div>
-        <div className="text-center text-lg font-semibold mb-6">ADMIN PANEL</div>
-        <nav className="flex flex-col gap-0.5">
+      <aside className="w-full md:w-72 min-h-[60px] md:min-h-screen bg-[#1e293b] text-white flex flex-row md:flex-col py-4 md:py-8 px-3 md:px-6 shadow-xl overflow-x-auto md:overflow-y-auto">
+        <div className="text-center text-3xl font-bold text-cyan-400 mb-2 tracking-wide hidden md:block">GAS</div>
+        <div className="text-center text-lg font-semibold mb-8 hidden md:block">ADMIN PANEL</div>
+        <nav className="flex flex-row md:flex-col gap-1 w-full">
           <button
-            className={`flex items-center w-full px-3 py-2 mb-2 rounded hover:bg-gray-700 transition-colors text-left gap-2 ${activeTab === null ? 'bg-gray-700 font-bold' : ''}`}
-            style={{ background: activeTab === null ? '#223047' : 'none' }}
+            className={`flex items-center w-full px-2 md:px-4 py-2 md:py-3 mb-2 rounded-xl hover:bg-cyan-800/80 transition-colors text-left gap-2 md:gap-3 text-sm md:text-base ${activeTab === null ? 'bg-cyan-800/90 font-bold' : ''}`}
             onClick={() => setActiveTab(null)}
           >
-            <Users className="text-blue-400" /> Dashboard
+            <Home className="text-cyan-400" /> Dashboard
           </button>
           <button
-            className="flex items-center w-full px-3 py-2 mb-2 rounded hover:bg-cyan-700 transition-colors text-left gap-2"
+            className="flex items-center w-full px-2 md:px-4 py-2 md:py-3 mb-2 rounded-xl hover:bg-blue-800/80 transition-colors text-left gap-2 md:gap-3 text-sm md:text-base"
             onClick={() => navigate('/enrolled-students')}
           >
-            <ClipboardList className="text-cyan-400" size={16} /> Enrolled Students
+            <ClipboardList className="text-blue-400" size={18} /> Enrolled Students
           </button>
           {tabs.map((tab, idx) => (
             <button
               key={tab.label}
-              className={`flex items-center w-full px-3 py-2 mb-2 rounded hover:bg-gray-700 transition-colors text-left gap-2 ${activeTab === idx ? 'bg-gray-700 font-bold' : ''}`}
-              style={{ background: activeTab === idx ? '#223047' : 'none' }}
+              className={`flex items-center w-full px-2 md:px-4 py-2 md:py-3 mb-2 rounded-xl hover:bg-gray-700/80 transition-colors text-left gap-2 md:gap-3 text-sm md:text-base ${activeTab === idx ? 'bg-gray-700/90 font-bold' : ''}`}
               onClick={() => setActiveTab(idx)}
             >
               {tab.icon}
               {tab.label}
             </button>
           ))}
-          <button onClick={() => setShowSettings(true)} className="flex items-center px-3 py-2 hover:bg-gray-700 rounded text-left gap-2">
-            <Settings size={16} /> Settings
+          <button onClick={() => setShowSettings(true)} className="flex items-center px-2 md:px-4 py-2 md:py-3 hover:bg-gray-700/80 rounded-xl text-left gap-2 md:gap-3 text-sm md:text-base mt-2">
+            <Settings size={18} /> Settings
           </button>
-          <button onClick={handleLogout} className="flex items-center px-3 py-2 hover:bg-red-600 rounded text-left gap-2 text-red-300 hover:text-white transition-colors mt-2">
-            <LogOut size={16} /> Logout
+          <button onClick={handleLogout} className="flex items-center px-2 md:px-4 py-2 md:py-3 hover:bg-red-700/80 rounded-xl text-left gap-2 md:gap-3 text-sm md:text-base text-red-300 hover:text-white transition-colors mt-4">
+            <LogOut size={18} /> Logout
           </button>
         </nav>
       </aside>
       {/* Main Content */}
-      <main className="flex-1 p-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Users className="text-blue-600" /> Admin Dashboard
+      <main className="flex-1 p-3 sm:p-6 md:p-10 space-y-6 md:space-y-8 bg-gray-50 dark:bg-gray-900 min-w-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-2 sm:gap-0">
+          <h1 className="text-2xl sm:text-4xl font-bold flex items-center gap-2 sm:gap-3 text-blue-700 dark:text-cyan-400">
+            <Users className="text-blue-600 dark:text-cyan-300" /> Admin Dashboard
           </h1>
-          <button onClick={handleRefreshData} className="flex items-center gap-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors">
-            <RefreshCw size={16} /> Refresh Data
+          <button onClick={handleRefreshData} className="flex items-center gap-2 px-4 sm:px-6 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl shadow transition-colors font-semibold w-full sm:w-auto">
+            <RefreshCw size={18} /> Refresh Data
           </button>
         </div>
-
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 overflow-x-auto md:overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Registrations</p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.total}</p>
+              </div>
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                <Users className="text-blue-600 dark:text-blue-400" size={24} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border-l-4 border-emerald-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Approved</p>
+                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.approved}</p>
+              </div>
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl">
+                <CheckCircle className="text-emerald-600 dark:text-emerald-400" size={24} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
+                <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{stats.inProgress}</p>
+              </div>
+              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
+                <Clock className="text-yellow-600 dark:text-yellow-400" size={24} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border-l-4 border-red-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Rejected</p>
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">{stats.rejected}</p>
+              </div>
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+                <XCircle className="text-red-600 dark:text-red-400" size={24} />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Main Content Area (Tabs) */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+          {activeTab === null && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-blue-700 dark:text-cyan-400">Welcome, Admin!</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">Select a section from the sidebar to manage registrations, students, courses, and more.</p>
+            </div>
+          )}
+          {activeTab === 0 && <Notifications />}
+          {activeTab === 1 && <RegProgress />}
+          {activeTab === 2 && <ViewReg />}
+          {activeTab === 3 && <ManageCourse />}
+          {activeTab === 4 && <ManageStudent />}
+        </div>
         {/* Settings Modal */}
         {showSettings && (
-          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-full max-w-sm relative transform transition-all duration-300 ease-in-out ${settings.darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative transition-all duration-300 ease-in-out ${settings.darkMode ? 'text-white' : 'text-gray-900'}`}>
               <button
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-xl"
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-2xl bg-gray-100 dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center"
                 onClick={() => setShowSettings(false)}
+                aria-label="Close"
               >
                 &times;
               </button>
-              <h2 className="text-xl font-bold mb-3">Settings</h2>
-
-              {/* Profile Section */}
-              <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                <div className="w-12 h-12 rounded-full bg-blue-200 dark:bg-blue-600 flex items-center justify-center text-xl font-bold text-blue-700 dark:text-blue-200">A</div>
-                <div>
-                  <div className="font-semibold">Admin User</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">admin@email.com</div>
-                </div>
-              </div>
-
-              <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">In-App Notifications</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Receive notifications within the application</p>
+              <h3 className="text-2xl font-bold mb-6 text-blue-700 dark:text-cyan-400 flex items-center gap-3">
+                <Settings className="text-blue-600 dark:text-cyan-300" size={24} />
+                Settings
+              </h3>
+              <div className="space-y-6">
+                {/* Dark Mode Toggle */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <Sun className="text-blue-600 dark:text-blue-400" size={20} />
+                    </div>
+                    <div>
+                      <span className="font-semibold text-gray-900 dark:text-white">Dark Mode</span>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Toggle dark theme</p>
+                    </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.notifications}
-                      onChange={() => handleSettingsChange('notifications')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Sound Notifications</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Play a sound for new notifications</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.soundNotifications}
-                      onChange={() => handleSettingsChange('soundNotifications')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Auto Refresh</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Automatically refresh data periodically</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.autoRefresh}
-                      onChange={() => handleSettingsChange('autoRefresh')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Compact Mode</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Reduce spacing for a denser UI</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.compactMode}
-                      onChange={() => handleSettingsChange('compactMode')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Dark Mode</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Switch to dark theme</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.darkMode}
-                      onChange={() => handleSettingsChange('darkMode')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Color Theme</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Choose your preferred color theme</p>
-                  </div>
-                  <select 
-                    className="border rounded p-1 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    value={settings.theme}
-                    onChange={(e) => handleThemeChange(e.target.value)}
+                  <button
+                    onClick={() => handleSettingsChange('darkMode')}
+                    className={`w-14 h-7 flex items-center rounded-full p-1 duration-300 ease-in-out ${settings.darkMode ? 'bg-cyan-600' : 'bg-gray-300'}`}
                   >
-                    <option value="system">System</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="blue">Blue</option>
-                  </select>
+                    <span
+                      className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ease-in-out ${settings.darkMode ? 'translate-x-7' : ''}`}
+                    />
+                  </button>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Language</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Select your preferred language</p>
+                {/* Notifications Section */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Bell className="text-blue-600 dark:text-cyan-300" size={20} />
+                    Notifications
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-3">
+                        <Bell className="text-emerald-600 dark:text-emerald-400" size={18} />
+                        <span className="font-medium text-gray-900 dark:text-white">Push Notifications</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.notifications}
+                        onChange={() => handleSettingsChange('notifications')}
+                        className="accent-cyan-600 w-5 h-5"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-3">
+                        <Mail className="text-blue-600 dark:text-blue-400" size={18} />
+                        <span className="font-medium text-gray-900 dark:text-white">Email Notifications</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.emailNotifications}
+                        onChange={() => handleSettingsChange('emailNotifications')}
+                        className="accent-cyan-600 w-5 h-5"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-3">
+                        <Volume2 className="text-purple-600 dark:text-purple-400" size={18} />
+                        <span className="font-medium text-gray-900 dark:text-white">Sound Notifications</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.soundNotifications}
+                        onChange={() => handleSettingsChange('soundNotifications')}
+                        className="accent-cyan-600 w-5 h-5"
+                      />
+                    </div>
                   </div>
-                  <select 
-                    className="border rounded p-1 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                </div>
+                {/* Display Section */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Monitor className="text-blue-600 dark:text-cyan-300" size={20} />
+                    Display
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-3">
+                        <Minimize2 className="text-amber-600 dark:text-amber-400" size={18} />
+                        <span className="font-medium text-gray-900 dark:text-white">Compact Mode</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settings.compactMode}
+                        onChange={() => handleSettingsChange('compactMode')}
+                        className="accent-cyan-600 w-5 h-5"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <div className="flex items-center gap-3">
+                        <Palette className="text-purple-600 dark:text-purple-400" size={18} />
+                        <span className="font-medium text-gray-900 dark:text-white">Theme</span>
+                      </div>
+                      <select
+                        value={settings.theme}
+                        onChange={e => handleThemeChange(e.target.value)}
+                        className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                      >
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                {/* Language Section */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center gap-3">
+                    <Globe className="text-emerald-600 dark:text-emerald-400" size={18} />
+                    <span className="font-medium text-gray-900 dark:text-white">Language</span>
+                  </div>
+                  <select
                     value={settings.language}
-                    onChange={(e) => handleLanguageChange(e.target.value)}
+                    onChange={e => handleLanguageChange(e.target.value)}
+                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                   >
                     <option value="en">English</option>
                     <option value="fr">French</option>
                     <option value="es">Spanish</option>
-                    <option value="sw">Swahili</option>
                   </select>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-sm">Email Notifications</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Receive notifications via email</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={settings.emailNotifications}
-                      onChange={() => handleSettingsChange('emailNotifications')}
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-2">
-                <button 
-                  className="w-full py-1.5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold transition-colors text-sm"
-                  onClick={() => {/* Implement change password functionality */}}
-                >
-                  Change Password
-                </button>
-                <button 
-                  className="w-full py-1.5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold transition-colors text-sm"
+                {/* Reset Button */}
+                <button
                   onClick={handleResetSettings}
+                  className="w-full mt-6 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl py-3 font-semibold transition-colors flex items-center justify-center gap-2"
                 >
+                  <RotateCcw className="text-gray-600 dark:text-gray-400" size={18} />
                   Reset to Default
                 </button>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Dashboard Cards and View Registration (default view) */}
-        {activeTab === null && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-blue-500 text-white">
-                <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <Users size={32} />
-                  <p className="text-lg font-semibold">Total Registrations</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-green-500 text-white">
-                <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <UserCheck size={32} />
-                  <p className="text-lg font-semibold">Approved</p>
-                  <p className="text-2xl font-bold">{stats.approved}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-yellow-400 text-white">
-                <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <Clock size={32} />
-                  <p className="text-lg font-semibold">In Progress</p>
-                  <p className="text-2xl font-bold">{stats.inProgress}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-red-500 text-white">
-                <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <UserX size={32} />
-                  <p className="text-lg font-semibold">Rejected</p>
-                  <p className="text-2xl font-bold">{stats.rejected}</p>
-                </CardContent>
-              </Card>
-            </div>
-            <ViewReg />
-          </>
-        )}
-        {/* Tab Content */}
-        {activeTab !== null && (
-          <div className="mt-2">
-            {activeTab === 0 && <Notifications />}
-            {activeTab === 1 && <RegProgress />}
-            {activeTab === 2 && <ViewReg />}
-            {activeTab === 3 && <ManageCourse />}
-            {activeTab === 4 && <ManageStudent />}
           </div>
         )}
       </main>

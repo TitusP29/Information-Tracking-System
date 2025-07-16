@@ -81,7 +81,15 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    console.error('useAuth must be used within an AuthProvider')
+    // Return a default context to prevent crashes
+    return {
+      user: null,
+      loading: true,
+      signUp: () => Promise.reject(new Error('Auth not initialized')),
+      signIn: () => Promise.reject(new Error('Auth not initialized')),
+      signOut: () => Promise.reject(new Error('Auth not initialized')),
+    }
   }
   return context
 }

@@ -1,167 +1,262 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from '../../../supabaseClient';
+import useApprovedStudents from '../../hooks/useApprovedStudents';
+import {
+  Users,
+  CalendarDays,
+  Filter,
+  CheckCircle,
+  X,
+  Clock,
+  User,
+  BookOpen,
+  Monitor,
+  DoorOpen,
+  Laptop2,
+  ChevronDown,
+  ChevronUp,
+  Plus
+} from 'lucide-react';
 
-const initialAttendance = [
-  { 
-    id: "CS/24/001", 
-    name: "John Doe", 
-    course: "Software Development",
-    status: "Present",
-    attendanceType: "Physical" 
-  },
-  { 
-    id: "EE/23/045", 
-    name: "Mary Johnson", 
-    course: "Web Development",
-    status: "Absent",
-    attendanceType: "Virtual" 
-  },
-  { 
-    id: "ME/24/008", 
-    name: "Michael Smith", 
-    course: "Software Development",
-    status: "Late",
-    attendanceType: "Physical" 
-  },
-  { 
-    id: "CE/23/032", 
-    name: "Emily Brown", 
-    course: "Web Development",
-    status: "Present",
-    attendanceType: "Virtual" 
-  },
-];
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const Attendance = () => {
-  const [attendanceData, setAttendanceData] = useState(initialAttendance);
-  const [selectedCourse, setSelectedCourse] = useState("All");
+  const [timetableData, setTimetableData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [form, setForm] = useState({
+    student_number: '',
+    class_name: '',
+    day: '',
+    time: '',
+    location: '',
+    type: 'Physical',
+    instructor: ''
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
-  const courses = ["All", "Software Development", "Web Development"];
+  // Fetch approved students for the dropdown
+  const { students: approvedStudents, loading: studentsLoading } = useApprovedStudents();
 
-  const updateAttendance = (index, newStatus, newType) => {
-    const updated = [...attendanceData];
-    if (newStatus) updated[index].status = newStatus;
-    if (newType) updated[index].attendanceType = newType;
-    setAttendanceData(updated);
+  useEffect(() => {
+    fetchTimetableData();
+  }, []);
+
+  const fetchTimetableData = async () => {
+    setLoading(true);
+    setError(null);
+    const { data, error } = await supabase
+      .from('timetables')
+      .select('*')
+      .order('day', { ascending: true })
+      .order('time', { ascending: true });
+    if (error) setError(error.message);
+    setTimetableData(data || []);
+    setLoading(false);
   };
 
-  const filteredAttendance = selectedCourse === "All" 
-    ? attendanceData 
-    : attendanceData.filter(student => student.course === selectedCourse);
+  const handleAddTimetable = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const { error } = await supabase.from('timetables').insert([form]);
+    setSaving(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setShowAddModal(false);
+      setForm({
+        student_number: '',
+        class_name: '',
+        day: '',
+        time: '',
+        location: '',
+        type: 'Physical',
+        instructor: ''
+      });
+      fetchTimetableData();
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto bg-white p-6 rounded shadow">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Student Attendance</h1>
-          <div className="flex items-center gap-4">
-            <label className="font-medium">Filter by Course:</label>
-            <select 
-              value={selectedCourse} 
-              onChange={(e) => setSelectedCourse(e.target.value)}
-              className="border rounded px-3 py-1"
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+      <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
+          <h1 className="text-3xl font-bold text-blue-700 dark:text-cyan-400 flex items-center gap-3">
+            <CalendarDays className="text-blue-600 dark:text-cyan-300" size={32} />
+            Timetable Management
+          </h1>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <button
+              className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2 shadow-lg"
+              onClick={() => setShowAddModal(true)}
             >
-              {courses.map(course => (
-                <option key={course} value={course}>{course}</option>
-              ))}
-            </select>
+              <Plus size={18} />
+              Add Timetable Entry
+            </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse">
-            <thead className="bg-gray-200 text-left">
-              <tr>
-                <th className="p-3">Student ID</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Course</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Attendance Type</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAttendance.map((student, index) => (
-                <tr
-                  key={student.id}
-                  className="border-b hover:bg-gray-50 transition-all"
-                >
-                  <td className="p-3">{student.id}</td>
-                  <td className="p-3">{student.name}</td>
-                  <td className="p-3">{student.course}</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm ${
-                        student.status === "Present"
-                          ? "bg-green-500"
-                          : student.status === "Absent"
-                          ? "bg-red-500"
-                          : "bg-yellow-500"
-                      }`}
-                    >
-                      {student.status}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <span className={`px-3 py-1 rounded-full text-sm
-                      ${student.attendanceType === "Physical" 
-                        ? "bg-blue-100 text-blue-800" 
-                        : "bg-purple-100 text-purple-800"}`}
-                    >
-                      {student.attendanceType}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateAttendance(index, "Present")}
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                        >
-                          Present
-                        </button>
-                        <button
-                          onClick={() => updateAttendance(index, "Absent")}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          Absent
-                        </button>
-                        <button
-                          onClick={() => updateAttendance(index, "Late")}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                        >
-                          Late
-                        </button>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateAttendance(index, null, "Physical")}
-                          className={`px-3 py-1 rounded ${
-                            student.attendanceType === "Physical"
-                              ? "bg-blue-500 text-white"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          Physical
-                        </button>
-                        <button
-                          onClick={() => updateAttendance(index, null, "Virtual")}
-                          className={`px-3 py-1 rounded ${
-                            student.attendanceType === "Virtual"
-                              ? "bg-purple-500 text-white"
-                              : "bg-purple-100 text-purple-800"
-                          }`}
-                        >
-                          Virtual
-                        </button>
-                      </div>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="flex items-center justify-center min-h-[200px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading timetable...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center min-h-[200px]">
+            <div className="text-center">
+              <Users className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">
+                Error loading timetable
+              </h3>
+              <p className="text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-700 text-left">
+                <tr>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Class</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Day</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Time</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                  <th className="p-4 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Instructor</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {timetableData.map((entry, idx) => (
+                  <tr key={idx} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                    <td className="p-4 font-medium text-gray-900 dark:text-white">
+                      {approvedStudents.find(s => s.id === entry.student_number)?.name || entry.student_number}
+                    </td>
+                    <td className="p-4 text-gray-900 dark:text-white">{entry.class_name}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{entry.day}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{entry.time}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{entry.location}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{entry.type}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{entry.instructor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+
+      {/* Add Timetable Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-lg w-full relative">
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-2xl bg-gray-100 dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center"
+              onClick={() => setShowAddModal(false)}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4">Add Timetable Entry</h2>
+            <form onSubmit={handleAddTimetable} className="space-y-4">
+              <div>
+                <label className="block font-medium mb-1">Student</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={form.student_number}
+                  onChange={e => setForm({ ...form, student_number: e.target.value })}
+                  required
+                  disabled={studentsLoading}
+                >
+                  <option value="">Select Student</option>
+                  {approvedStudents.map(student => (
+                    <option key={student.id} value={student.id}>
+                      {student.name} ({student.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Class Name</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={form.class_name}
+                  onChange={e => setForm({ ...form, class_name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Day</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={form.day}
+                  onChange={e => setForm({ ...form, day: e.target.value })}
+                  required
+                >
+                  <option value="">Select Day</option>
+                  {daysOfWeek.map(day => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Time</label>
+                <input
+                  type="time"
+                  className="w-full border rounded px-3 py-2"
+                  value={form.time}
+                  onChange={e => setForm({ ...form, time: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Location</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={form.location}
+                  onChange={e => setForm({ ...form, location: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Type</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={form.type}
+                  onChange={e => setForm({ ...form, type: e.target.value })}
+                  required
+                >
+                  <option value="Physical">Physical</option>
+                  <option value="Virtual">Virtual</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Instructor</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={form.instructor}
+                  onChange={e => setForm({ ...form, instructor: e.target.value })}
+                  required
+                />
+              </div>
+              {error && <div className="text-red-600 text-sm">{error}</div>}
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold w-full"
+                disabled={saving}
+              >
+                {saving ? 'Saving...' : 'Add Entry'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

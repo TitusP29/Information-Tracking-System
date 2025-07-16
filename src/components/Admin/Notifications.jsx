@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
+import {
+  Bell,
+  Send,
+  CheckCircle,
+  Trash2,
+  X,
+  AlertCircle,
+  Info,
+  CheckSquare,
+  Square,
+  MessageSquare,
+  Clock
+} from 'lucide-react';
 
 const Notifications = () => {
   const { user } = useAuth();
@@ -18,21 +31,18 @@ const Notifications = () => {
     fetchStudents();
     fetchNotifications();
     
-    // Subscribe to new notifications
-    const subscription = supabase
-      .channel('notifications')
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'notifications',
-          filter: `recipient_id=eq.admin`
-        }, 
-        (payload) => {
-          setNotifications(prev => [payload.new, ...prev]);
-        }
-      )
-      .subscribe();
+    // Poll for new notifications instead of using realtime
+    // Initial fetch
+    fetchNotifications();
+    
+    // Set up polling every 30 seconds
+    const pollInterval = setInterval(() => {
+      fetchNotifications();
+    }, 30000); // 30 seconds
+    
+    return () => {
+      clearInterval(pollInterval);
+    };
 
     return () => {
       subscription.unsubscribe();
@@ -51,15 +61,36 @@ const Notifications = () => {
   };
 
   const fetchNotifications = async () => {
-    const { data, error } = await supabase
+    if (!user || !user.id || typeof user.id !== 'string' || user.id.length < 10) {
+      console.log('fetchNotifications: user or user.id not ready or invalid', user);
+      return;
+    }
+    console.log('fetchNotifications: user.id =', user.id);
+
+    // Fetch user-specific notifications (recipient_id is UUID)
+    const { data: userNotifs, error: userError } = await supabase
       .from('notifications')
       .select('*')
-      .or(`recipient_id.eq.${user.id},recipient_id.eq.admin`)
+      .eq('recipient_id', user.id)
       .order('created_at', { ascending: false });
-    
-    if (!error && data) {
-      setNotifications(data);
+    if (userError) {
+      console.error('Error fetching user notifications:', userError, userError.message, userError.details, userError.hint, userError.code);
     }
+
+    // Fetch admin-wide notifications (recipient_role is text)
+    const { data: adminNotifs, error: adminError } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('recipient_role', 'admin')
+      .order('created_at', { ascending: false });
+    if (adminError) {
+      console.error('Error fetching admin notifications:', adminError, adminError.message, adminError.details, adminError.hint, adminError.code);
+    }
+
+    // Merge and sort notifications by created_at descending
+    const notifications = [...(userNotifs || []), ...(adminNotifs || [])]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    setNotifications(notifications);
   };
 
   const handleStudentSelect = (studentId) => {
@@ -152,90 +183,86 @@ const Notifications = () => {
     switch (type) {
       case 'success':
         return (
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+            <CheckCircle className="w-6 h-6 text-emerald-600" />
           </div>
         );
       case 'warning':
         return (
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+            <AlertCircle className="w-6 h-6 text-amber-600" />
           </div>
         );
       case 'error':
         return (
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+            <X className="w-6 h-6 text-red-600" />
           </div>
         );
       default:
         return (
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+            <Info className="w-6 h-6 text-blue-600" />
           </div>
         );
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Notifications</h1>
-        <div className="flex items-center space-x-3">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-blue-700 dark:text-cyan-400 flex items-center gap-3">
+          <Bell className="text-blue-600 dark:text-cyan-300" size={32} /> Notifications
+        </h1>
+        <div className="flex items-center gap-4">
           <button 
             onClick={() => setShowMessageForm(!showMessageForm)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-colors font-semibold flex items-center gap-2 shadow-lg"
           >
+            <Send size={18} />
             {showMessageForm ? 'Cancel' : 'Send Message'}
           </button>
           <button 
             onClick={handleMarkAllAsRead}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+            className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-semibold flex items-center gap-2 shadow-lg"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <span>Mark all as read</span>
+            <CheckCircle size={18} />
+            Mark all as read
           </button>
           <button 
             onClick={handleClearAll}
-            className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center space-x-2"
+            className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-semibold flex items-center gap-2 shadow-lg"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Clear all</span>
+            <Trash2 size={18} />
+            Clear all
           </button>
         </div>
       </div>
 
+      {/* Message Form */}
       {showMessageForm && (
-        <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Send Message to Students</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-blue-700 dark:text-cyan-400 mb-6 flex items-center gap-3">
+            <MessageSquare className="text-blue-600 dark:text-cyan-300" size={24} />
+            Send Message to Students
+          </h2>
           <form onSubmit={handleSendMessage} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Select Students
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                 {students.map((student) => (
-                  <div key={student.id} className="flex items-center space-x-3">
+                  <div key={student.id} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
                     <input
                       type="checkbox"
                       id={`student-${student.id}`}
                       checked={selectedStudents.includes(student.user_id)}
                       onChange={() => handleStudentSelect(student.user_id)}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="h-5 w-5 text-cyan-600 rounded border-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                     />
-                    <label htmlFor={`student-${student.id}`} className="text-sm text-gray-700">
+                    <label htmlFor={`student-${student.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
                       {student.first_name} {student.surname} - {student.course}
                     </label>
                   </div>
@@ -244,14 +271,14 @@ const Notifications = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Message Type
               </label>
               <select
                 name="type"
                 value={messageForm.type}
                 onChange={handleMessageChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="info">Information</option>
                 <option value="success">Success</option>
@@ -261,7 +288,7 @@ const Notifications = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Message Subject
               </label>
               <input
@@ -269,37 +296,38 @@ const Notifications = () => {
                 name="subject"
                 value={messageForm.subject}
                 onChange={handleMessageChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter message subject"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Message Content
               </label>
               <textarea
                 name="content"
                 value={messageForm.content}
                 onChange={handleMessageChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows="4"
                 placeholder="Type your message here..."
               />
             </div>
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-4 pt-4">
               <button
                 type="button"
                 onClick={() => setShowMessageForm(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-6 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-colors font-semibold flex items-center gap-2"
               >
+                <Send size={18} />
                 Send Message
               </button>
             </div>
@@ -307,32 +335,34 @@ const Notifications = () => {
         </div>
       )}
 
+      {/* Notifications List */}
       <div className="space-y-4">
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-200 ${
-              !notification.read ? 'hover:shadow-md' : ''
+            className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 ${
+              !notification.read ? 'ring-2 ring-cyan-500/20 hover:shadow-xl' : 'hover:shadow-lg'
             }`}
           >
-            <div className="flex items-start space-x-4">
+            <div className="flex items-start gap-4">
               {getNotificationIcon(notification.type)}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {notification.title}
                   </p>
-                  <span className="text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <Clock size={16} />
                     {new Date(notification.created_at).toLocaleString()}
-                  </span>
+                  </div>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   {notification.message}
                 </p>
               </div>
               {!notification.read && (
                 <div className="flex-shrink-0">
-                  <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+                  <span className="inline-block w-3 h-3 rounded-full bg-cyan-600 animate-pulse"></span>
                 </div>
               )}
             </div>
@@ -340,23 +370,12 @@ const Notifications = () => {
         ))}
       </div>
 
+      {/* Empty State */}
       {notifications.length === 0 && (
-        <div className="text-center py-12">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <Bell className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No notifications</h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
             You're all caught up! Check back later for new notifications.
           </p>
         </div>

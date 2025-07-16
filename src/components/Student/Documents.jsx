@@ -6,12 +6,53 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
+import {
+  FileText,
+  Upload,
+  Download,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Clock,
+  FileCheck,
+  FileX,
+  CloudUpload,
+  IdCard,
+  CreditCard,
+  Home,
+  Award
+} from 'lucide-react';
 
 const REQUIRED_DOCUMENTS = [
-  { id: 'id', label: 'ID Document' },
-  { id: 'certificate', label: 'Latest Certificate' },
-  { id: 'residence', label: 'Proof of Residence' },
-  { id: 'payment', label: 'Proof of Payment' }
+  { 
+    id: 'id', 
+    label: 'ID Document',
+    description: 'Upload your valid identification document',
+    icon: IdCard,
+    color: 'blue'
+  },
+  { 
+    id: 'certificate', 
+    label: 'Latest Certificate',
+    description: 'Upload your most recent academic certificate',
+    icon: Award,
+    color: 'emerald'
+  },
+  { 
+    id: 'residence', 
+    label: 'Proof of Residence',
+    description: 'Upload proof of your current residence',
+    icon: Home,
+    color: 'purple'
+  },
+  { 
+    id: 'payment', 
+    label: 'Proof of Payment',
+    description: 'Upload proof of your course payment',
+    icon: CreditCard,
+    color: 'amber'
+  }
 ];
 
 function Documents() {
@@ -285,8 +326,29 @@ function Documents() {
     fileInputRefs.current[docId]?.click();
   };
 
+  const getUploadedCount = () => {
+    return REQUIRED_DOCUMENTS.filter(doc => getDocumentStatus(doc.id)).length;
+  };
+
+  const getStatusBadge = (isUploaded) => {
+    if (isUploaded) {
+      return (
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl font-semibold text-sm shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
+          <CheckCircle size={14} />
+          Uploaded
+        </div>
+      );
+    }
+    return (
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl font-semibold text-sm shadow-lg bg-gradient-to-r from-slate-400 to-slate-500 text-white">
+        <Clock size={14} />
+        Pending
+      </div>
+    );
+  };
+
   return (
-    <div className="p-4 max-w-5xl mx-auto">
+    <div className="p-8 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 min-h-screen">
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -297,103 +359,199 @@ function Documents() {
           },
         }}
       />
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Upload Application Documents</h1>
-        
+      
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl shadow-lg">
+            <FileText className="text-white" size={32} />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-amber-800 dark:from-slate-100 dark:to-amber-100">
+              Upload Application Documents
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2 text-lg">
+              Complete your application by uploading all required documents
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Section */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl">
+                  <FileCheck className="text-emerald-600 dark:text-emerald-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Documents Uploaded</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100 text-xl">
+                    {getUploadedCount()} of {REQUIRED_DOCUMENTS.length}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                  <FileText className="text-blue-600 dark:text-blue-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Progress</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100 text-xl">
+                    {Math.round((getUploadedCount() / REQUIRED_DOCUMENTS.length) * 100)}%
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="w-32 h-32 relative">
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="54"
+                  fill="none"
+                  stroke="#e2e8f0"
+                  strokeWidth="8"
+                />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="54"
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="8"
+                  strokeDasharray={`${(getUploadedCount() / REQUIRED_DOCUMENTS.length) * 339.292} 339.292`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  {Math.round((getUploadedCount() / REQUIRED_DOCUMENTS.length) * 100)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-  
-
-
-      <h2 className="text-xl font-bold mb-4">Required Documents</h2>
-      
+      {/* Message Display */}
       {message && (
-        <div className="mb-4 p-3 rounded bg-blue-50 text-blue-700">
-          {message}
+        <div className="mb-6 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="text-blue-600 dark:text-blue-400" size={20} />
+            <span className="text-blue-700 dark:text-blue-300 font-medium">{message}</span>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Documents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {REQUIRED_DOCUMENTS.map((doc) => {
           const existingDoc = documents && documents[doc.id];
           const attachment = existingDoc?.attachments?.[0];
+          const isUploaded = getDocumentStatus(doc.id);
+          const IconComponent = doc.icon;
 
           return (
-            <Card key={doc.id} className="bg-white shadow">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">{doc.label}</h3>
-                      {attachment && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          File: {attachment.file_url}
-                        </p>
-                      )}
+            <div key={doc.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all duration-200">
+              {/* Document Header */}
+              <div className="bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-700 dark:to-slate-800 p-6 border-b border-slate-200 dark:border-slate-600">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-3 bg-gradient-to-r from-${doc.color}-500 to-${doc.color}-600 rounded-2xl shadow-lg`}>
+                      <IconComponent className="text-white" size={24} />
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      getDocumentStatus(doc.id) 
-                        ? 'bg-emerald-100 text-emerald-800' 
-                        : ''
-                    }`}>
-                      {getDocumentStatus(doc.id) ? 'UPLOADED' : ''}
-                    </span>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">{doc.label}</h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm">{doc.description}</p>
+                    </div>
                   </div>
-                  
-                  <div className="flex justify-end gap-2 mt-2">
-                    {getDocumentStatus(doc.id) ? (
-                      <>
-                        <a
-                            href={attachment.signedUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
-                            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
-                          >
-                            Download
-                          </a>
-
-                        <button
-                          onClick={() => removeDocument(existingDoc.id)}
-                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm"
-                          disabled={uploading}
-                        >
-                          Remove
-                        </button>
-                      </>
-                    ) : (
-                      <div className="w-full">
-                        <input
-                          type="file"
-                          ref={el => fileInputRefs.current[doc.id] = el}
-                          className="hidden"
-                          onChange={(e) => handleFileChange(e, doc.id)}
-                          accept=".pdf"
-                          disabled={uploading}
-                        />
-                        <Button
-                          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                          disabled={uploading}
-                          onClick={() => handleUploadClick(doc.id)}
-                        >
-                          {uploading && selectedDocType === doc.id ? (
-                            <span className="flex items-center justify-center">
-                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              Uploading...
-                            </span>
-                          ) : (
-                            'UPLOAD'
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                  {getStatusBadge(isUploaded)}
                 </div>
-              </CardContent>
-            </Card>
+                
+                {attachment && (
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                    <FileText size={16} />
+                    <span className="truncate">{attachment.file_url}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Document Content */}
+              <div className="p-6">
+                {isUploaded ? (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-700">
+                      <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle size={20} />
+                        <span className="font-semibold">Document uploaded successfully</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <a
+                        href={attachment?.signedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                      >
+                        <Download size={18} />
+                        Download
+                      </a>
+
+                      <button
+                        onClick={() => removeDocument(existingDoc.id)}
+                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        disabled={uploading}
+                      >
+                        <Trash2 size={18} />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-700">
+                      <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+                        <Clock size={20} />
+                        <span className="font-semibold">Document required for application</span>
+                      </div>
+                    </div>
+                    
+                    <div className="w-full">
+                      <input
+                        type="file"
+                        ref={el => fileInputRefs.current[doc.id] = el}
+                        className="hidden"
+                        onChange={(e) => handleFileChange(e, doc.id)}
+                        accept=".pdf"
+                        disabled={uploading}
+                      />
+                      <button
+                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        disabled={uploading}
+                        onClick={() => handleUploadClick(doc.id)}
+                      >
+                        {uploading && selectedDocType === doc.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <CloudUpload size={18} />
+                            Upload Document
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           );
         })}
       </div>
