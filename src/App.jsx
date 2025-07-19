@@ -20,6 +20,7 @@ import Grades from './components/Enrolled/Grades'
 import Attendance from './components/Enrolled/Attendance'
 import FeesManagement from './components/Enrolled/FeesManagement'
 import EnrolledStudentsTable from './components/Enrolled/EnrolledStudentsTable'
+import UserProfile from './components/Auth/UserProfile';
 
 function App() {
   return (
@@ -29,7 +30,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<Signup />} />
-          
+          <Route path="/userProfile" element={<UserProfile />} />
+       
           {/* I-Enabler Dashboard - Standalone */}
           <Route path="/ienabler/*" element={<IEnablerStudentDashboard />} />
           
