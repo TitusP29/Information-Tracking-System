@@ -12,6 +12,41 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Create user profile if it doesn't exist
+  useEffect(() => {
+    const createProfileIfNotExists = async () => {
+      if (!user) return;
+      // Check if profile exists
+      const { data: profile, error } = await supabase
+        .from('user_profile')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      if (!profile) {
+        // Prompt user for first name and surname
+        const firstName = prompt('Enter your first name:');
+        const surname = prompt('Enter your surname:');
+        const role = user.email.endsWith('@graceartisanschool.education') ? 'admin' : 'student';
+        const { error: insertError } = await supabase
+          .from('user_profile')
+          .insert([
+            {
+              id: user.id,
+              first_name: firstName,
+              surname: surname,
+              role: role
+            }
+          ]);
+        if (insertError) {
+          alert('Failed to create profile: ' + insertError.message);
+        }
+      }
+    };
+    if (user?.id) {
+      createProfileIfNotExists();
+    }
+  }, [user]);
+
   useEffect(() => {
     async function fetchStudentData() {
       try {
