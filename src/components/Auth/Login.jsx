@@ -76,7 +76,7 @@ const Login = () => {
       }
 
       // Navigate based on role
-      if (userRole === 'student') {
+      if (profile.role === 'student') {
         navigate('/student')
       } else {
         navigate('/dashboard')
