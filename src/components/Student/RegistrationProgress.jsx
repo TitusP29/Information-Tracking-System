@@ -40,7 +40,16 @@ const RegistrationProgress = () => {
           .eq('user_id', user?.id)
           .single();
 
-        if (registerError) throw registerError;
+        if (registerError) {
+          // If error is 'no rows', treat as no registration yet
+          if (registerError.message && registerError.message.includes('multiple (or no) rows returned')) {
+            setProgressData(null);
+            setError(null);
+            setLoading(false);
+            return;
+          }
+          throw registerError;
+        }
 
         if (registerData) {
           // Then fetch the progress data using the national_id
@@ -50,7 +59,16 @@ const RegistrationProgress = () => {
             .eq('student_number', registerData.national_id)
             .single();
 
-          if (progressError) throw progressError;
+          if (progressError) {
+            // If error is 'no rows', treat as no progress yet
+            if (progressError.message && progressError.message.includes('multiple (or no) rows returned')) {
+              setProgressData(null);
+              setError(null);
+              setLoading(false);
+              return;
+            }
+            throw progressError;
+          }
           setProgressData(progressData);
         }
       } catch (err) {
@@ -105,6 +123,14 @@ const RegistrationProgress = () => {
     return (
       <div className="max-w-xl mx-auto py-6 text-center">
         <p className="text-red-600">Error loading progress data: {error}</p>
+      </div>
+    );
+  }
+
+  if (!progressData) {
+    return (
+      <div className="max-w-xl mx-auto py-6 text-center">
+        <p className="text-gray-600">You have not started any registration yet. Please begin your registration to see progress here.</p>
       </div>
     );
   }
