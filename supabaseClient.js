@@ -16,6 +16,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
     flowType: 'pkce'
   },
+  realtime: false, // Completely disable realtime to prevent WebSocket warnings
   global: {
     headers: {
       'Content-Type': 'application/json',

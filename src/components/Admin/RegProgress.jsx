@@ -5,6 +5,22 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import { toast, Toaster } from 'react-hot-toast';
+import {
+  ClipboardList,
+  Eye,
+  CheckCircle,
+  Clock,
+  X,
+  AlertCircle,
+  FileText,
+  Download,
+  ArrowRight,
+  Calendar,
+  User,
+  GraduationCap,
+  CheckSquare,
+  Square
+} from 'lucide-react';
 
 const PDFViewer = ({ fileUrl }) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -167,7 +183,7 @@ const RegProgress = () => {
 
 
   return (
-    <div className="p-6">
+    <div className="space-y-8">
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -178,57 +194,86 @@ const RegProgress = () => {
           },
         }}
       />
-      <h2 className="text-2xl font-bold mb-4">Registration Progress Management</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b">Student Number</th>
-              <th className="py-2 px-4 border-b">Name</th>
-              <th className="py-2 px-4 border-b">Course</th>
-              <th className="py-2 px-4 border-b">Status</th>
-              <th className="py-2 px-4 border-b">Registration Date</th>
-              <th className="py-2 px-4 border-b">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map(student => (
-              <tr key={student.id} className="hover:bg-gray-50">
-                <td className="px-6 py-3 border-b whitespace-nowrap text-sm text-gray-700 align-middle">{student.national_id}</td>
-                <td className="px-6 py-3 border-b whitespace-nowrap text-sm font-medium text-gray-900 align-middle">{student.first_name} {student.surname}</td>
-                <td className="px-6 py-3 border-b whitespace-nowrap text-sm text-gray-700 align-middle">{student.course}</td>
-                <td className="px-6 py-3 border-b whitespace-nowrap text-sm align-middle">
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                    student.progress?.application_review === 'approved' ? 'bg-green-100 text-green-700' : 
-                    student.progress?.application_review === 'rejected' ? 'bg-red-100 text-red-700' :
-                    'bg-yellow-100 text-yellow-700'
-                  }`}>
-                    {student.progress?.application_review === 'approved' ? 'Approved' : 
-                     student.progress?.application_review === 'rejected' ? 'Rejected' : 'Pending'}
-                  </span>
-                </td>
-                <td className="px-6 py-3 border-b whitespace-nowrap text-sm text-gray-700 align-middle">{student.reg_date ? new Date(student.reg_date).toLocaleDateString() : ''}</td>
-                <td className="px-6 py-3 border-b whitespace-nowrap text-center align-middle">
-                  <button onClick={() => handleViewProgress(student)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow flex items-center gap-2">
-                    View Progress <span className="ml-1">→</span>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-blue-700 dark:text-cyan-400 flex items-center gap-3">
+          <ClipboardList className="text-blue-600 dark:text-cyan-300" size={32} />
+          Registration Progress Management
+        </h1>
       </div>
-      {/* Modal placeholder - to be implemented next */}
+
+      {/* Students Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-x-auto">
+        <table className="min-w-[600px] md:min-w-full text-xs md:text-sm text-left">
+            <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+              <tr>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student Number</th>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Course</th>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Registration Date</th>
+                <th className="px-2 md:px-8 py-2 md:py-4 text-left font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {students.map(student => (
+                <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <td className="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {student.national_id}
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {student.first_name} {student.surname}
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    {student.course}
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      student.progress?.application_review === 'approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 
+                      student.progress?.application_review === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
+                      'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
+                    }`}>
+                      {student.progress?.application_review === 'approved' ? 'Approved' : 
+                       student.progress?.application_review === 'rejected' ? 'Rejected' : 'Pending'}
+                    </span>
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    {student.reg_date ? new Date(student.reg_date).toLocaleDateString() : ''}
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap text-sm font-medium">
+                    <button 
+                      onClick={() => handleViewProgress(student)} 
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-xl shadow-lg transition-colors font-semibold flex items-center gap-2"
+                    >
+                      <Eye size={16} />
+                      View Progress
+                      <ArrowRight size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      {/* Progress Modal */}
       {modalOpen && selectedStudent && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-transparent backdrop-blur-md">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-3xl relative animate-fade-in">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-3 sm:p-8 w-full max-w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto relative">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl"
+              className="absolute top-2 sm:top-4 right-2 sm:right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-2xl bg-gray-100 dark:bg-gray-700 rounded-full w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center"
               onClick={() => setModalOpen(false)}
+              aria-label="Close"
             >
               &times;
             </button>
-            <h3 className="text-2xl font-semibold mb-6">Progress Management - {selectedStudent.first_name} {selectedStudent.surname}</h3>
+            
+            <h3 className="text-2xl font-bold text-blue-700 dark:text-cyan-400 mb-6 flex items-center gap-3">
+              <User className="text-blue-600 dark:text-cyan-300" size={24} />
+              Progress Management - {selectedStudent.first_name} {selectedStudent.surname}
+            </h3>
+            
             <div className="space-y-6">
               {/* Application Submitted Step */}
               <ProgressStep
@@ -272,24 +317,24 @@ const RegProgress = () => {
               />
 
               {/* Application Review Card */}
-              <div className="bg-white rounded-lg p-6 shadow-md">
+              <div className="bg-white dark:bg-gray-700 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <span className={`inline-block w-5 h-5 rounded-full ${
-                      selectedStudent.progress?.application_review === 'approved' ? 'bg-green-500 border-2 border-green-700' :
+                    <span className={`inline-block w-6 h-6 rounded-full ${
+                      selectedStudent.progress?.application_review === 'approved' ? 'bg-emerald-500 border-2 border-emerald-700' :
                       selectedStudent.progress?.application_review === 'rejected' ? 'bg-red-500 border-2 border-red-700 flex items-center justify-center' :
-                      'bg-yellow-400 border-2 border-yellow-600'
+                      'bg-amber-400 border-2 border-amber-600'
                     }`}>
-                      {selectedStudent.progress?.application_review === 'rejected' ? '✖' : ''}
+                      {selectedStudent.progress?.application_review === 'rejected' ? <X size={12} className="text-white" /> : ''}
                     </span>
-                    <h4 className="text-lg font-semibold">Application Review</h4>
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">Application Review</h4>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
-                      className={`px-4 py-1 rounded ${
-                        selectedStudent.progress?.application_review === 'approved' ? 'bg-green-500 text-white' :
-                        'bg-gray-200 text-gray-700'
-                      } font-semibold`}
+                      className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
+                        selectedStudent.progress?.application_review === 'approved' ? 'bg-emerald-600 text-white' :
+                        'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
                       onClick={async () => {
                         // Check if all other fields are complete
                         const progress = selectedStudent.progress;
@@ -311,24 +356,31 @@ const RegProgress = () => {
                         }
 
                         await updateProgress(selectedStudent.national_id, 'application_review', 'approved');
-                        toast.success('Application approved successfully!');
+                        toast.success('Application approved successfully! Student is now enrolled.');
+                        
+                        // Refresh enrolled students list if the function exists
+                        if (window.refreshEnrolledStudents) {
+                          setTimeout(() => {
+                            window.refreshEnrolledStudents();
+                          }, 1000);
+                        }
                       }}
                     >Approve</button>
                     <button
-                      className={`px-4 py-1 rounded ${
-                        selectedStudent.progress?.application_review === 'in_progress' ? 'bg-blue-500 text-white' :
-                        'bg-gray-200 text-gray-700'
-                      } font-semibold`}
+                      className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
+                        selectedStudent.progress?.application_review === 'in_progress' ? 'bg-blue-600 text-white' :
+                        'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
                       onClick={async () => {
                         await updateProgress(selectedStudent.national_id, 'application_review', 'in_progress');
                         toast.success('Application status updated to In Progress');
                       }}
                     >In Progress</button>
                     <button
-                      className={`px-4 py-1 rounded ${
-                        selectedStudent.progress?.application_review === 'rejected' ? 'bg-red-500 text-white' :
-                        'bg-gray-200 text-gray-700'
-                      } font-semibold`}
+                      className={`px-6 py-2 rounded-xl font-semibold transition-colors ${
+                        selectedStudent.progress?.application_review === 'rejected' ? 'bg-red-600 text-white' :
+                        'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
                       onClick={async () => {
                         await updateProgress(selectedStudent.national_id, 'application_review', 'rejected');
                         toast.success('Application rejected');
@@ -338,8 +390,9 @@ const RegProgress = () => {
                 </div>
               </div>
             </div>
+            
             <button
-              className="mt-8 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow"
+              className="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-xl shadow-lg font-semibold transition-colors"
               onClick={() => setModalOpen(false)}
             >
               Close
@@ -347,20 +400,23 @@ const RegProgress = () => {
           </div>
         </div>
       )}
+
+      {/* PDF Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col">
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold">Preview: {previewDoc.type.charAt(0).toUpperCase() + previewDoc.type.slice(1)}</span>
-              <span className="text-gray-500">{previewDoc.file_type}</span>
+        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col">
+          <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div className="flex items-center gap-3">
+              <FileText className="text-blue-600 dark:text-cyan-300" size={24} />
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                Preview: {previewDoc.type.charAt(0).toUpperCase() + previewDoc.type.slice(1)}
+              </span>
+              <span className="text-gray-500 dark:text-gray-400">{previewDoc.file_type}</span>
             </div>
             <button 
-              className="text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200 flex items-center gap-2"
+              className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium transition-colors duration-200 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-xl"
               onClick={() => setPreviewDoc(null)}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <X size={20} />
               Close Preview
             </button>
           </div>
@@ -379,25 +435,25 @@ function ProgressStep({ label, required, status, lastUpdated, onUpdate, showView
 
   let statusColor, icon, borderColor, bgColor;
   if (status === 'complete' || status === 'approved') {
-    statusColor = 'bg-green-500';
-    icon = <span className="inline-block w-5 h-5 rounded-full bg-green-500 border-2 border-green-700"></span>;
-    borderColor = 'border-green-200';
-    bgColor = 'bg-green-50';
+    statusColor = 'bg-emerald-500';
+    icon = <CheckCircle className="w-6 h-6 text-emerald-600" />;
+    borderColor = 'border-emerald-200 dark:border-emerald-700';
+    bgColor = 'bg-emerald-50 dark:bg-emerald-900/20';
   } else if (status === 'in_progress') {
-    statusColor = 'bg-yellow-400';
-    icon = <span className="inline-block w-5 h-5 rounded-full bg-yellow-400 border-2 border-yellow-600"></span>;
-    borderColor = 'border-yellow-200';
-    bgColor = 'bg-blue-50';
+    statusColor = 'bg-amber-500';
+    icon = <Clock className="w-6 h-6 text-amber-600" />;
+    borderColor = 'border-amber-200 dark:border-amber-700';
+    bgColor = 'bg-blue-50 dark:bg-blue-900/20';
   } else if (status === 'rejected') {
     statusColor = 'bg-red-500';
-    icon = <span className="inline-block w-5 h-5 rounded-full bg-red-500 border-2 border-red-700 flex items-center justify-center">✖</span>;
-    borderColor = 'border-red-200';
-    bgColor = 'bg-red-50';
+    icon = <X className="w-6 h-6 text-red-600" />;
+    borderColor = 'border-red-200 dark:border-red-700';
+    bgColor = 'bg-red-50 dark:bg-red-900/20';
   } else {
     statusColor = 'bg-gray-500';
-    icon = <span className="inline-block w-5 h-5 rounded-full bg-gray-500 border-2 border-gray-700 flex items-center justify-center">-</span>;
-    borderColor = 'border-gray-200';
-    bgColor = 'bg-gray-100';
+    icon = <Square className="w-6 h-6 text-gray-600" />;
+    borderColor = 'border-gray-200 dark:border-gray-700';
+    bgColor = 'bg-gray-100 dark:bg-gray-800';
   }
 
   const handleViewFile = (doc) => {
@@ -409,67 +465,84 @@ function ProgressStep({ label, required, status, lastUpdated, onUpdate, showView
   };
 
   return (
-    <div className={`flex items-center justify-between p-4 rounded-lg border-2 ${borderColor} ${bgColor}`}>
+    <div className={`flex items-center justify-between p-6 rounded-2xl border-2 ${borderColor} ${bgColor} shadow-lg`}>
       <div className="flex items-center gap-4">
         {icon}
         <div>
-          <div className="font-semibold text-lg">{label} {required && <span className="text-red-500">*</span>}</div>
-          <div className="text-xs text-gray-500">Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Not started'}</div>
+          <div className="font-bold text-lg text-gray-900 dark:text-white">
+            {label} {required && <span className="text-red-500">*</span>}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
+            <Calendar size={14} />
+            Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Not started'}
+          </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3">
         <button
-          className={`px-4 py-1 rounded ${status === 'complete' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'} font-semibold`}
+          className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+            status === 'complete' ? 'bg-emerald-600 text-white' : 
+            'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+          }`}
           onClick={() => onUpdate('complete')}
         >Complete</button>
         <button
-          className={`px-4 py-1 rounded ${status === 'in_progress' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} font-semibold`}
+          className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+            status === 'in_progress' ? 'bg-blue-600 text-white' : 
+            'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+          }`}
           onClick={() => onUpdate('in_progress')}
         >In Progress</button>
         {showViewDocuments ? (
           <button
-            className={`px-4 py-1 rounded bg-cyan-700 text-white font-semibold`}
+            className="px-4 py-2 rounded-xl bg-cyan-600 text-white font-semibold transition-colors hover:bg-cyan-700"
             onClick={() => setShowDocs(v => !v)}
           >{showDocs ? 'Hide Documents' : 'View Documents'}</button>
         ) : (
           <button
-            className={`px-4 py-1 rounded ${status === 'rejected' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'} font-semibold`}
+            className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+              status === 'rejected' ? 'bg-red-600 text-white' : 
+              'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+            }`}
             onClick={() => onUpdate('rejected')}
           >Reject</button>
         )}
       </div>
+      
       {showViewDocuments && showDocs && (
-        <div className="w-full mt-4 bg-gray-50 p-4 rounded shadow-inner">
-          <h4 className="font-semibold mb-4">Uploaded Documents</h4>
+        <div className="w-full mt-6 bg-gray-50 dark:bg-gray-700 p-6 rounded-2xl shadow-inner">
+          <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <FileText className="text-blue-600 dark:text-cyan-300" size={20} />
+            Uploaded Documents
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {REQUIRED_TYPES.map(type => {
               const docs = attachments.filter(a => a.type === type);
               return (
-                <div key={type} className="p-4 border rounded-lg bg-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-gray-700">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-                    <span className="text-sm text-gray-500">{docs.length} file(s)</span>
+                <div key={type} className="p-4 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{docs.length} file(s)</span>
                   </div>
                   {docs.length > 0 ? (
                     <div className="space-y-2">
                       {docs.map((doc, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm text-gray-600">File {index + 1}</span>
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">File {index + 1}</span>
                           <button
-                            className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                            className="text-cyan-600 hover:text-cyan-700 text-sm font-semibold flex items-center gap-1 transition-colors"
                             onClick={() => handleViewFile(doc)}
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                            </svg>
+                            <Eye size={16} />
                             View
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <span className="text-red-500 text-sm">Not Uploaded</span>
+                    <span className="text-red-500 text-sm font-semibold">Not Uploaded</span>
                   )}
                 </div>
               );

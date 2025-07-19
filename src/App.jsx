@@ -2,7 +2,8 @@ import './App.css'
 import AdminDashboard from './components/Admin/AdminDashboard'
 import { AuthProvider } from './contexts/AuthContext'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Signup from './components/Auth/signup'
+import Signup from './components/Auth/Signup'
+import Login from './components/Auth/Login'
 
 import StudentDashboard from './components/Student/StudentDashboard'
 import ApplicationIntake from './components/Student/ApplicationIntake'
@@ -11,7 +12,6 @@ import RegistrationProgress from './components/Student/RegistrationProgress'
 import Documents from './components/Student/Documents'
 import IEnablerStudentDashboard from './components/IEnabler/IEnablerStudentDashboard'
 
-import Login from './components/Auth/login'
 import AboutUs from './components/Student/Aboutus'
 import StudentLayout from './components/Student/StudentLayout'
 
@@ -19,7 +19,10 @@ import EnrolledStudents from './components/Enrolled/EnrolledStudents'
 import Grades from './components/Enrolled/Grades'
 import Attendance from './components/Enrolled/Attendance'
 import FeesManagement from './components/Enrolled/FeesManagement'
-import EnrolledStudentsTable from './components/Enrolled/EnrolledStudentsTable'
+import EnrolledStudentsIndex from './components/Enrolled/EnrolledStudentsIndex'
+import AssignmentManager from './components/Enrolled/AssignmentManager';
+import ExamManager from './components/Enrolled/ExamManager';
+import LessonManager from './components/Enrolled/LessonManager';
 import UserProfile from './components/Auth/UserProfile';
 
 function App() {
@@ -27,6 +30,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/signup" element={<Signup />} />
@@ -46,10 +51,13 @@ function App() {
           </Route>
 
           <Route path="/enrolled-students" element={<EnrolledStudents />}>
-            <Route index element={<EnrolledStudentsTable />} />
+            <Route index element={<EnrolledStudentsIndex />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="grades" element={<Grades />} />
             <Route path="fees-management" element={<FeesManagement />} />
+            <Route path="assignments" element={<AssignmentManager />} />
+            <Route path="exams" element={<ExamManager />} />
+            <Route path="lessons" element={<LessonManager />} />
           </Route>
 
           <Route path="/enrolled-students/feesmanagement" element={<Navigate to="/enrolled-students/fees-management" replace />} />
