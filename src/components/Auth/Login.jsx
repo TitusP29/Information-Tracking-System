@@ -31,9 +31,20 @@ const Login = () => {
         .from('user_profile')
         .select('role')
         .eq('id', data.user.id)
-        .single()
+        .single();
 
-      if (profileError) throw profileError
+      // Handle case where no profile is found
+      if (profileError && profileError.message.includes('JSON object requested, multiple (or no) rows returned')) {
+        navigate('/userProfile');
+        setLoading(false);
+        return;
+      }
+      if (profileError) throw profileError;
+      if (!profile) {
+        navigate('/userProfile');
+        setLoading(false);
+        return;
+      }
 
       // Navigate based on role
       if (profile.role === 'student') {

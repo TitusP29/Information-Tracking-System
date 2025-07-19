@@ -26,39 +26,23 @@ function Signup() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSuccess(false)
-    setLoading(true)
-
-    // Determine role
-    const role = formData.email.endsWith('@graceartisanschool.education') ? 'admin' : 'student'
+    e.preventDefault();
+    setError('');
+    setSuccess(false);
+    setLoading(true);
 
     try {
       // Sign up with Supabase Auth
-      const { data: authData, error: authError } = await signUp(formData.email, formData.password)
-      if (authError) throw authError
+      const { data, error: authError } = await signUp(formData.email, formData.password);
+      if (authError) throw authError;
 
-      // Create user profile
-      const { error: profileError } = await supabase
-        .from('user_profile')
-        .insert([
-          {
-            id: authData.user.id,
-            first_name: formData.firstName,
-            surname: formData.surname,
-            role: role
-          }
-        ])
-
-      if (profileError) throw profileError
-
-      // Success: prompt user to check email and log in
-      setSuccess(true)
+      // Success: redirect to login page
+      setSuccess(true);
+      navigate('/');
     } catch (err) {
-      setError(err.message || 'Signup failed')
+      setError(err.message || 'Signup failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
